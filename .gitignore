@@ -12,11 +12,21 @@ __pycache__
 # VSCode editor settings
 .vscode
 
+# Data and model directories
 /octo/
 /datasets/
-/Maniskill/mp_collect/
 /openvla/checkpoints/
 /openvla/wandb/
-/SimpleEnv/octo_collect/
-/SimpleEnv/wandb/
+/openvla/openvla-7b/
+/.maniskill/
+*.zip
 
+# Collect directories (通用规则匹配所有collect目录)
+**/mp_collect/
+**/octo_collect/
+
+
+# Specific collect directories
+/ManiSkill/mp_collect/
+/SimplerEnv/octo_collect/
+/SimplerEnv/wandb/

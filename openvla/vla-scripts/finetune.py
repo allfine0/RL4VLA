@@ -149,15 +149,33 @@ def finetune(cfg: FinetuneConfig) -> None:
     AutoProcessor.register(OpenVLAConfig, PrismaticProcessor)
     AutoModelForVision2Seq.register(OpenVLAConfig, OpenVLAForActionPrediction)
 
-    # Load OpenVLA Processor and Model using HF AutoClasses
-    processor = AutoProcessor.from_pretrained(cfg.vla_path, trust_remote_code=True)
-    vla = AutoModelForVision2Seq.from_pretrained(
-        cfg.vla_path,
-        torch_dtype=torch.bfloat16,
-        quantization_config=quantization_config,
-        low_cpu_mem_usage=True,
-        trust_remote_code=True,
-    )
+    # Load OpenVLA Processor and Model using explicit classes instead of AutoClasses
+    try:
+        # Try using AutoClasses first
+        processor = AutoProcessor.from_pretrained(cfg.vla_path, trust_remote_code=True)
+    except ValueError:
+        # If AutoClasses fail, use explicit PrismaticProcessor
+        print("AutoProcessor failed, trying PrismaticProcessor directly...")
+        processor = PrismaticProcessor.from_pretrained(cfg.vla_path, trust_remote_code=True)
+    
+    try:
+        vla = AutoModelForVision2Seq.from_pretrained(
+            cfg.vla_path,
+            torch_dtype=torch.bfloat16,
+            quantization_config=quantization_config,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+        )
+    except ValueError:
+        # If AutoModel fails, use explicit OpenVLAForActionPrediction
+        print("AutoModelForVision2Seq failed, trying OpenVLAForActionPrediction directly...")
+        vla = OpenVLAForActionPrediction.from_pretrained(
+            cfg.vla_path,
+            torch_dtype=torch.bfloat16,
+            quantization_config=quantization_config,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+        )
 
     # Device Placement =>> note that BitsAndBytes automatically handles for quantized training
     if cfg.use_quantization:

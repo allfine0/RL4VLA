@@ -122,4 +122,7 @@ dependencies:
       - wrapt==1.15.0
       - zipp==3.16.2
       - zstandard==0.21.0
+variables:
+  - PIP_TRUSTED_HOST=mirrors.cloud.aliyuncs.com
+  - PIP_INDEX_URL=https://mirrors.cloud.aliyuncs.com/pypi/simple/
 prefix: /scr/kpertsch/miniconda3/envs/rlds_env

@@ -366,6 +366,21 @@ class Runner:
             print(f"{self.args.name}: ep {episode:0>4d} | steps {steps} | e {elapsed_time:.2f}s")
             print(pprint.pformat({k: round(v, 4) for k, v in infos.items()}))
 
+            # === 保存rollout数据 ===
+            for env_idx in range(self.args.num_envs):
+                episode_data = {
+                    "image": self.buffer.obs[:, env_idx],           # [ep_len+1, H, W, 3]
+                    "action": self.buffer.actions[:, env_idx],      # [ep_len, 7]
+                    "instruction": self.buffer.instruction[env_idx],# str
+                    "rewards": self.buffer.rewards[:, env_idx],     # [ep_len, 1]
+                    "masks": self.buffer.masks[:, env_idx],         # [ep_len+1, 1]
+                }
+                np.savez(
+                    self.glob_dir / f"rollout_ep{episode:04d}_env{env_idx:02d}.npz",
+                    **episode_data
+                )
+            # === 保存rollout数据 ===
+
             # eval
             if episode % self.args.interval_eval == self.args.interval_eval - 1 or episode == max_episodes - 1:
                 print(f"Evaluating at {steps}")
